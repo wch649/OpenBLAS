@@ -87,15 +87,15 @@ int main(void) {
 	//C.show();
 
 	
-	////²âÊÔ×ªÖÃ
-	//double a[12] = { 1,2,3,4,5,6,7,8,9,8,7,6 };
-	//Matrix A(3, 4, a);
-	//Matrix C(4, 3);
-	//C = tran(A);
-	//cout << "A:\n";
-	//A.show();
-	//cout << "C=A':\n";
-	//C.show();
+	//²âÊÔ×ªÖÃ
+	double a[12] = { 1,2,3,4,5,6,7,8,9,8,7,6 };
+	Matrix A(3, 4, a);
+	Matrix C(4, 3);
+	C = tran(A);
+	cout << "A:\n";
+	A.show();
+	cout << "C=A':\n";
+	C.show();
 
 
 	/*double a[4] = { 1,2,3,4 };
