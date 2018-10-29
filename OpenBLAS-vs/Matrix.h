@@ -1,5 +1,5 @@
 ﻿#pragma once
-constexpr auto inf = 100;
+constexpr auto INF = 100;
 #ifndef MATRIX
 class Matrix {
 
@@ -134,18 +134,18 @@ public:
 	void MatrixTranspose(int m, int n, double * a, double *c);
 	/*
 		Description: |A|
-		Input:
-		Output:
-		Others:
+		Input: Matrix A
+			n: row of A
+		Output: |A|
 	*/
-	int MatrixDeterminant();
+	double MatrixDeterminant(int, double *);
 	/*
 		Description: rank(A)
 		Input:
 		Output:
 		Others:
 	*/
-	int MatrixRank();
+	int MatrixRank(int m,int n, double *a);
 	
 
 	/*
@@ -159,10 +159,20 @@ public:
 	/*
 		Norm of the matrix
 	*/
+	/*
+		Description: norm-1、norm-2、norm-inf (A)
+		Input: Matrix A
+		Output: norm
+	*/
 	double Matrix_1Norm(Matrix A);
 	double Matrix_2Norm(Matrix A);
 	double Matrix_InfNorm(Matrix A);
 };
+
+
+/*
+	Not Class member function
+*/
 
 /*
 	Description: inv(A)
@@ -190,4 +200,19 @@ Matrix tran(Matrix A);
 	Output: ?-norm
 */
 double norm(Matrix A, int count);
+
+/*
+	Description: |A|
+	Input: Matrix A
+	Output: |A|
+*/
+double det(Matrix A);
+
+/*
+	Description: rank(A)
+	Input: Matrix A
+	Output: rank(A)
+*/
+int ranka(Matrix A);
+
 #endif

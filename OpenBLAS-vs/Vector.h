@@ -2,7 +2,7 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 #include "cblas.h"
-#define INF -1
+constexpr auto INF = 100;
 class Vector {
 private:
 	int n;

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include "Matrix.h"
-#include <cblas.h>
+extern "C" {
+#include "cblas.h"
+}
 #include <iostream>
 using namespace std;
 
@@ -49,7 +51,7 @@ int main(void) {
 	//Matrix A(3, 3, a);
 	//Matrix B(3, 3, a);
 	//cout << "A:" << endl;
-	//A.MatrixInverse(A.getarray(), A.getrow());
+	////A.MatrixInverse(A.getarray(), A.getrow());
 	//A.show();
 	//cout << "B=inv(A):" << endl;
 	//B = inv(A);
@@ -87,19 +89,54 @@ int main(void) {
 	//C.show();
 
 	
-	//²âÊÔ×ªÖÃ
-	double a[12] = { 1,2,3,4,5,6,7,8,9,8,7,6 };
-	Matrix A(3, 4, a);
-	Matrix C(4, 3);
-	C = tran(A);
-	cout << "A:\n";
-	A.show();
-	cout << "C=A':\n";
-	C.show();
+	////²âÊÔ×ªÖÃ
+	//double a[12] = { 1.23456,2,3,4,5,6,7.465456132,8,9,8,7,6 };
+	//Matrix A(3, 4, a);
+	//Matrix C(4, 3);
+	//C = tran(A);
+	//cout << "A:\n";
+	//A.show();
+	//cout << "C=A':\n";
+	//C.show();
 
+	////²âÊÔ¾ØÕóµÄÐÐÁÐÊ½
+	//double a[25] = { 0.4218  ,  0.0357   , 0.7431  ,  0.0318  ,  0.6948,
+	//0.9157  ,  0.8491  ,  0.3922  ,  0.2769 ,   0.3171,
+	//0.7922  ,  0.9340  ,  0.6555   , 0.0462  ,  0.9502,
+	//0.9595  ,  0.6787  ,  0.1712  ,  0.0971  ,  0.0344,
+	//0.6557  ,  0.7577  ,  0.7060   , 0.8235  ,  0.4387 };
+	//Matrix A(5, 5, a);
+	//cout << det(A)<<endl;
+	////cout << A.MatrixDeterminant(A.getrow(), A.getarray());
+	//A.show();
 
-	/*double a[4] = { 1,2,3,4 };
-	Vector ()
-	cout << norm();*/
+	////²âÊÔ¾ØÕóµÄÖÈ
+	///*double a[25] = { 0.4218  ,  0.0357   , 0.7431  ,  0.0318  ,  0.6948,
+	//0.9157  ,  0.8491  ,  0.3922  ,  0.2769 ,   0.3171,
+	//0.7922  ,  0.9340  ,  0.6555   , 0.0462  ,  0.9502,
+	//0.9595  ,  0.6787  ,  0.1712  ,  0.0971  ,  0.0344,
+	//0.6557  ,  0.7577  ,  0.7060   , 0.8235  ,  0.4387 };*/
+	//double a[12] = {
+	//	 1   ,  2  ,   3   ,  4,
+	//	 4   ,  5  ,   9   ,  6,
+	//	 3   ,  5  ,   8   ,  6
+	//};
+	//Matrix A(4, 3, a);
+	//cout << ranka(A)<<endl;
+	//A.show();
+
+	////²âÊÔ¾ØÕóµÄ·¶Êý
+	//double a[12] = {
+	//	 1   ,  2  ,   3   ,  4,
+	//	 4   ,  5  ,   -9   ,  6,
+	//	 3   ,  5  ,   8   ,  6
+	//};
+	//Matrix A(3,4, a);
+	////Matrix A(4,3, a);
+	////cout << A.Matrix_InfNorm(A)<<endl;
+	//cout << "1-norm: "<< norm(A, 1) << endl;
+	//cout << "2-norm: " << norm(A, 2) << endl;
+	//cout << "inf-norm: " << norm(A, INF)<<endl;
+	//A.show();	
 	return 0;
 }

@@ -4,7 +4,6 @@
 #include <math.h>
 using namespace std;
 
-#define INF -1
 
 Vector::Vector(int n1)
 {
