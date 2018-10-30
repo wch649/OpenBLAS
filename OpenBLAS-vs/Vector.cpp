@@ -10,7 +10,12 @@ Vector::Vector(int n1)
 	n = n1;
 	v = (double *)malloc(n * sizeof(double));
 }
-
+Vector::Vector(int n1,double *a)
+{
+	n = n1;
+	v = (double *)malloc(n * sizeof(double));
+	for (int i = 0; i < n; i++) v[i] = a[i];
+}
 void Vector::setn(int n1)
 {
 	n = n1;

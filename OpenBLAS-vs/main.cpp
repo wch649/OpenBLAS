@@ -34,7 +34,7 @@ int main(void) {
 	//B.show(); 
 	//C.show();
 
-	////测试乘法
+	////测试矩阵*矩阵
 	//double a[9] = { 1,2,3,4,5,6,7,8,9};
 	//double b[9] = { 1,0,1,0,1,0,0,1,0};
 	//double c[9] = { 0,0,0,0,0,0,0,0,0};
@@ -45,6 +45,24 @@ int main(void) {
 	//A.show(); 
 	//B.show(); 
 	//C.show(); 
+
+	////测试矩阵*向量
+	//double a[9] = { 1,2,3,4,5,6,7,8,9};
+	//double b[3] = { 1,2,3 };
+	//Matrix A(3, 3, a);
+	//Vector B(3, b);
+	//Vector C = A * B;
+	//C.printv();
+
+	////测试矩阵*数值
+	//double a[9] = { 1,2,3,4,5,6,7,8,9};
+	//Matrix A(3, 3, a);
+	//Matrix B = A.MatrixAlpha(3);
+	//B.show();
+
+
+
+
 
 	////测试求逆
 	//double a[9] = { 0,1,0, 1,0,1, -1,0,1 };
@@ -85,10 +103,31 @@ int main(void) {
 	//A.show();
 	//cout << "B:\n";
 	//B.show();
-	//cout << "C=A\B:\n";
+	//cout << "C=A\\B:\n";
 	//C.show();
 
+	//测试向量叉乘
+
+	////测试向量点乘
+	//double a[9] = { 1,2,3,4,5,6,7,8,9};
+	//double b[9] = { 1,0,1,0,1,0,0,1,0};
+	//Vector x(9, a);
+	//Vector y(9, b);
+	//x.printv();
+	//y.printv();
+	//cout <<x * y<<endl;
 	
+
+	////测试相等
+	//double a[6] = { 1.0,2.0,3.0,4.0,5.0,6.0 };
+	//double b[6] = { 1,2,3,4,5,6 };
+	//Matrix A(2, 3, a);
+	//Matrix B(2, 3, b);
+	////cout << A.MatrixIsEqual(B) << endl;
+	//if (A == B) cout << "equal\n";
+	//else cout << "not equal" << endl;
+
+
 	////测试转置
 	//double a[12] = { 1.23456,2,3,4,5,6,7.465456132,8,9,8,7,6 };
 	//Matrix A(3, 4, a);
@@ -98,6 +137,7 @@ int main(void) {
 	//A.show();
 	//cout << "C=A':\n";
 	//C.show();
+
 
 	////测试矩阵的行列式
 	//double a[25] = { 0.4218  ,  0.0357   , 0.7431  ,  0.0318  ,  0.6948,
@@ -131,12 +171,20 @@ int main(void) {
 	//	 4   ,  5  ,   -9   ,  6,
 	//	 3   ,  5  ,   8   ,  6
 	//};
+	//double b[12] = {
+	//		 2   ,  2  ,   3   ,  4,
+	//		 4   ,  5  ,   -9   ,  6,
+	//		 3   ,  5  ,   8   ,  6
+	//};	
 	//Matrix A(3,4, a);
-	////Matrix A(4,3, a);
+	///*Matrix B(3,4, b);
+	//B = A;
+	//B.show();*/
 	////cout << A.Matrix_InfNorm(A)<<endl;
 	//cout << "1-norm: "<< norm(A, 1) << endl;
 	//cout << "2-norm: " << norm(A, 2) << endl;
 	//cout << "inf-norm: " << norm(A, INF)<<endl;
 	//A.show();	
+
 	return 0;
 }

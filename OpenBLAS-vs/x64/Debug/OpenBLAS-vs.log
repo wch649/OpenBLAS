@@ -1,8 +1,3 @@
-﻿  Matrix.cpp
+﻿  main.cpp
 f:\openblas\openblas\temp\include\cblas.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-f:\openblas-vs\openblas-vs\matrix.cpp(261): warning C4244: “初始化”: 从“double”转换到“float”，可能丢失数据
-  main.cpp
-f:\openblas\openblas\temp\include\cblas.h : warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-  正在生成代码...
-f:\openblas-vs\openblas-vs\matrix.cpp(396): warning C4715: “norm”: 不是所有的控件路径都返回值
   OpenBLAS-vs.vcxproj -> F:\OpenBLAS-vs\x64\Debug\OpenBLAS-vs.exe

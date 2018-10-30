@@ -1,18 +1,34 @@
 #include "Matrix.h"
 #include <cblas.h>
 #include <iostream>
+#include <math.h>
+#include <lapacke.h>
+#include <string.h>
 using namespace std;
+
+
+#define min(a,b) ((a)>(b)?(b):(a))
+double max(double *s) {
+	double M = s[0];
+	int len = sizeof(*s) / sizeof(double);
+	for (int i = 1; i < len; i++) {
+		cout << s[i] << endl;
+		if (s[i] > M) M = s[i];
+	}
+	return M;
+}
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 	// LU decomoposition of a general matrix
-	void dgetrf_(int* M, int *N, double* A, int* lda, int* IPIV, int* INFO);
+	//void dgetrf_(int* M, int *N, double* A, int* lda, int* IPIV, int* INFO);
 	// void sgetrf_(int* M, int *N, float* A, int* lda, int* IPIV, int* INFO);
 
 	// generate inverse of a matrix given its LU decomposition
-	void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
+	//void dgetri_(int* N, double* A, int* lda, int* IPIV, double* WORK, int* lwork, int* INFO);
 	// void sgetri_(int* N, float* A, int* lda, int* IPIV, float* WORK, int* lwork, int* INFO);
 
 #ifdef __cplusplus
@@ -53,6 +69,22 @@ Matrix::Matrix(int n)
 			else array[i*n + j] = 0.0;
 		}
 	}
+}
+
+Matrix::Matrix()
+{
+	row = 0;
+	column = 0;
+	array = NULL;
+}
+
+void Matrix::setsize(int m, int n)
+{
+	if (array) delete[]array;
+	array = new double[m*n];
+	row = m;
+	column = n;
+	for (long int i = m * n - 1; i >= 0; i--) array[i] = 0.0;
 }
 
 void Matrix::setrow(int m)
@@ -109,6 +141,12 @@ void Matrix::show()
 */
 
 
+/*Matrix Matrix::operator=(const Matrix & A)
+{
+	if (this->array) delete[]array;
+	return Matrix(A.row,A.column,A.array);s
+}*/
+
 void Matrix::MatrixAdd(int m, int n, double * a, double * c, double beta)
 {	//C = A + C
 	cblas_dgeadd(CblasRowMajor, m, n, 1, a, n, beta, c, n);
@@ -152,6 +190,13 @@ void Matrix::MatrixMulVector(int m, int n, double * a, double * x, double * y)
 	cblas_dgemv(CblasRowMajor, CblasNoTrans, m, n, 1, a, n, x, 1, 0, y, 1);
 }
 
+Vector Matrix::operator*(Vector &v)
+{
+	Vector x(this->row);
+	MatrixMulVector(this->row, this->column, this->getarray(), v.getv(), x.getv());
+	return x;
+}
+
 void Matrix::MatrixMulNumber(int m, int n, double * a, double * c, double alpha)
 {
 	cblas_dgeadd(CblasRowMajor, m, n, alpha, a, n, 0, c, n);
@@ -181,13 +226,13 @@ void Matrix::MatrixInverse(double * A, int N)
 //A \ B = inv(A) * B
 void Matrix::MatrixLeftDiv(Matrix B)
 {
-	//function ld() is ok!
+	//ld(*this, B);
 }
 
 //A / B = A * inv(B)
-void Matrix::MatrixRightDiv()
+void Matrix::MatrixRightDiv(Matrix B)
 {
-	// function operator/() is ok!
+	//*this / B;
 }
 
 Matrix Matrix::operator/(Matrix & A)
@@ -209,12 +254,28 @@ Matrix Matrix::operator/(Matrix & A)
 	return D;
 }
 
+bool Matrix::MatrixIsEqual(Matrix B)
+{
+	if (this->row == B.row && this->column == B.column) {
+		long int work = B.row * B.column;
+		//cout <<work<<" "<< memcmp(this->array, B.array, work * sizeof(double)) << endl;
+		if (!memcmp(this->array, B.array, work * sizeof(double))) {
+			return true;
+		}
+	}	
+	return false;
+}
+
+bool Matrix::operator==(const Matrix &B)
+{
+	return this->MatrixIsEqual(B);
+}
+
 
 void Matrix::MatrixTranspose(int m, int n, double * a, double *c)
 {
 	Matrix B(m);
-	//B.show();
-	//this->show();//lda is A's lda, but not op(A)'s lda
+	//lda is A's lda, but not op(A)'s lda
 	cblas_dgemm(CblasRowMajor, CblasTrans, CblasNoTrans, n, m, m, 1, a, n, B.array, m, 0, c, m);
 	delete[]B.array;
 }
@@ -258,7 +319,7 @@ int Matrix::MatrixRank(int m, int n, double *a)
 				if (a[j*n + i] < 0) {
 					cblas_dscal(n - i, -1, a + j * n + i, 1);
 				}
-				float t = a[i*n + i] / a[j*n + i];
+				double t = a[i*n + i] / a[j*n + i];
 				cblas_daxpy(n, -t, a + j * n + i, 1, a + i * n + i, 1);
 				cblas_dswap(n - i, a + i * n + i, 1, a + j * n + i, 1);
 			}
@@ -277,6 +338,207 @@ int Matrix::MatrixRank(int m, int n, double *a)
 		else cnt++;
 	}
 	return cnt;
+}
+
+
+/*
+		Eigenvalue calculation of matrix
+*/
+
+int Matrix::MatrixIsPosDef()
+{
+	if (!this->MatrixIsSym()) return 0;
+	Matrix v;
+	double *er = new double[row];
+	double *ei = new double[row];
+	this->MatrixEig(er, ei, v);
+	delete[]ei;
+	for (int i = row - 1; i >= 0; i--)
+		if (er[i] <= 0.0)
+		{
+			delete[]er;
+			return 0;
+		}
+	delete[]er;
+	return 1;
+}
+
+int Matrix::MatrixIsSym()
+{
+	if (row != column) return 0;
+	double *p0 = array;
+	for (int i = row - 1; i > 0; i--)
+	{
+		double *rp = p0 + row, *cp = p0 + 1;
+		for (int j = 0; j < i; j++)
+			if (*rp == *cp)
+			{
+				rp += row;
+				cp++;
+			}
+			else return 0;
+		p0 += row + 1;
+	}
+	return 1;
+}
+
+double Matrix::MatrixTrace()
+{
+	double t = 0.0;
+	double *p = array;
+	for (int i = row; i > 0; i--)
+	{
+		t += *p;
+		p += row + 1;
+	}
+	return t;
+}
+
+int Matrix::MatrixEig(double * er, double * ei, Matrix & v) // Matrix will be overwrite
+{
+	if (row != column)
+	{
+		printf("Not square matrix.");
+		return -1;
+	}
+	v.setsize(row, row);
+	Matrix vl(row, row);
+	lapack_int info = LAPACKE_dgeev(LAPACK_ROW_MAJOR, 'N', 'V', row, array, row, er, ei, vl.array, row, v.array, row);
+	/*
+	er and ei contain the real and imaginary parts, respectively, of the computed eigenvalues.
+	Complex conjugate pairs of eigenvalues appear consecutively with the eigenvalue having the positive imaginary part first.
+
+	the right eigenvectors vr(j) are stored one after another in the columns of v, in the same order as their eigenvalues.
+	If the j-th eigenvalue is real, then vr(j) = v(:,j), the j-th column of v. If the j-th and (j+1)-st eigenvalues form a complex
+	conjugate pair, then vr(j) = (:,j) + i*v(:,j+1) and vr(j+1) = v(:,j) - i*v(:,j+1).
+	*/
+	return info;
+}
+
+
+/*
+		Matrix decomposition
+*/
+
+int Matrix::MatrixQRfactorization(Matrix & q, Matrix & r) // Matrix won't be overwrite
+{
+	lapack_int info;
+	if (row <= column)
+	{
+		r.setsize(row, column);
+		memcpy(r.array, array, row*column * sizeof(double));
+		double *tau = new double[row];
+		info = LAPACKE_dgeqrf(LAPACK_ROW_MAJOR, row, column, r.array, column, tau); // get R and tau
+		q.setsize(row, row);
+		double *qp = q.array, *rp = r.array;
+		*qp = 1.0;
+		for (int i = 1; i < row; i++)
+		{
+			qp += row;
+			rp += column;
+			memcpy(qp, rp, i * sizeof(double));
+			for (int j = 0; j < i; j++) rp[j] = 0.0;
+			qp[i] = 1.0;
+		}
+		info = LAPACKE_dorgqr(LAPACK_ROW_MAJOR, row, row, row, q.array, row, tau); // get Q
+		delete[] tau;
+		return info;
+	}
+	else
+	{
+		// plan A : q is row * column
+		q.setsize(row, column);
+		memcpy(q.array, array, row*column * sizeof(double));
+		double *tau = new double[row];
+		info = LAPACKE_dgeqrf(LAPACK_ROW_MAJOR, row, column, q.array, column, tau); // get R and tau
+		r.setsize(column, column);
+		double *qp = q.array, *rp = r.array;
+		for (int i = column; i > 1; i--)
+		{
+			memcpy(rp, qp, i * sizeof(double));
+			qp += column + 1;
+			rp += column + 1;
+		}
+		*rp = *qp;
+		info = LAPACKE_dorgqr(LAPACK_ROW_MAJOR, row, column, column, q.array, column, tau); // get Q
+		delete[] tau;
+
+		// plan B : q is column * column
+		/*
+
+		*/
+	}
+
+	return info;
+}
+
+int Matrix::MatrixLUfactorization(Matrix & l, Matrix & u, int * ipiv) // Matrix won't be overwrite
+{
+	lapack_int info;
+	//int *ipiv = new int[min(row, column)];
+	if (row > column)
+	{
+		l.setsize(row, column);
+		memcpy(l.array, array, row*column * sizeof(double));
+		info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, row, column, l.array, column, ipiv);
+		// ?? I have no idea what ipiv meant......
+		u.setsize(column, column);
+		double *lp = l.array, *up = u.array;
+		for (int i = column; i > 1; i--)
+		{
+			memcpy(up, lp, i * sizeof(double));
+			*lp = 1.0;
+			for (int j = 1; j < i; j++) lp[j] = 0.0;
+			lp += column + 1;
+			up += column + 1;
+		}
+		*up = *lp;
+		*lp = 1.0;
+	}
+	else
+	{
+		u.setsize(row, column);
+		memcpy(u.array, array, row*column * sizeof(double));
+		info = LAPACKE_dgetrf(LAPACK_ROW_MAJOR, row, column, u.array, column, ipiv);
+		l.setsize(row, row);
+		double *lp = l.array, *up = u.array;
+		*lp = 1.0;
+		for (int i = 1; i < row; i++)
+		{
+			lp += row;
+			up += column;
+			memcpy(lp, up, i * sizeof(double));
+			for (int j = 0; j < i; j++) up[j] = 0.0;
+			lp[i] = 1.0;
+		}
+	}
+	/*
+	info = 0:  successful exit
+		 > 0 : if INFO = i, U(i, i) is exactly zero.The factorization has been completed, but the factor U is exactly singular,
+			   and division by zero will occur if it is used to solve a system of equations.
+	*/
+	return info;
+}
+
+int Matrix::MatrixSVDfactorization(double * s, Matrix & u, Matrix & vt)// Matrix will be rewrite
+{
+	u.setsize(row, row);
+	vt.setsize(column, column);
+	double *superb = new double[min(row, column) - 1];
+	lapack_int info = LAPACKE_dgesvd(LAPACK_ROW_MAJOR, 'A', 'A', row, column, array, column, s, u.array, row, vt.array, column, superb);
+	// ?? I have no idea what superb meant......
+	/*
+	info = 0:  successful exit.
+         > 0:  The algorithm computing did not converge, info specifies how many superdiagonals of an intermediate bidiagonal form B did not converge to zero.
+	*/
+
+	delete[]superb;
+	/* Check for convergence */
+	if (info > 0) {
+		printf("The algorithm computing SVD failed to converge.\n");
+		return info;
+	}
+	return info;
 }
 
 
@@ -300,15 +562,16 @@ double Matrix::Matrix_1Norm(Matrix A)
 }
 
 double Matrix::Matrix_2Norm(Matrix A)
-{	//补充矩阵的特征值
-	int m = A.row;
-	int n = A.column;
-	Matrix B(n, m);
-	B = tran(A);
-	B = B * A;
-	//B的最大特征值 开平方
-	int ans = 0;
-	delete[]B.getarray();
+{	//2-norm = max(svd(A))
+	Matrix u(row, row);
+	Matrix vt(column, column);
+	double *superb = new double[min(row, column) - 1];
+	double *s = new double[min(row, column)];
+	lapack_int info = LAPACKE_dgesvd(LAPACK_ROW_MAJOR, 'N', 'N', row, column, array, column, s, u.array, row, vt.array, column, superb);
+	//求*s的最大值
+	double ans = max(s);
+	delete[]s;
+	delete[]superb;
 	return ans;
 }
 
@@ -333,6 +596,11 @@ double Matrix::Matrix_InfNorm(Matrix A)
 /*
 	Not Class member function
 */
+
+Matrix operator*(const Vector &)
+{
+	return Matrix();
+}
 
 Matrix inv(Matrix A)
 {
@@ -380,13 +648,16 @@ Matrix tran(Matrix A)
 
 double norm(Matrix A, int count)
 {
-
+	Matrix B(A.getrow(),A.getcol(),A.getarray());
+	double ans = 0.0;
 	switch (count) {
-	case 1: return A.Matrix_1Norm(A); break;
-	case 2: break;
-	case INF: return A.Matrix_InfNorm(A); break;
+	case 1: ans = B.Matrix_1Norm(B); break;
+	case 2: ans = B.Matrix_2Norm(B); break;
+	case INF: ans = B.Matrix_InfNorm(B); break;
 	default:cout << "Parameter error!\n";
 	}
+	delete[]B.getarray();
+	return ans;
 }
 
 double det(Matrix A)

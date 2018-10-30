@@ -9,6 +9,7 @@ private:
 	double *v;
 public:
 	Vector(int); //two methods to Initialize,choose one
+	Vector(int n1, double * a);
 	void setn(int);
 	~Vector();
 	void setv();

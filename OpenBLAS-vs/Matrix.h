@@ -1,6 +1,7 @@
 ﻿#pragma once
-constexpr auto INF = 100;
+//constexpr auto INF = 100;
 #ifndef MATRIX
+#include "Vector.h"
 class Matrix {
 
 protected:
@@ -21,7 +22,10 @@ public:
 				0,0,1}
 	*/
 	Matrix(int n);
+	Matrix();
 
+
+	void setsize(int m, int n);
 	void setrow(int m);
 	void setcol(int n);
 	void setarray(double *a);
@@ -45,6 +49,7 @@ public:
 		Output: C = a*A + b*C;
 		Others:
 	*/
+	//Matrix operator=(const Matrix &A);
 	void MatrixAdd(int m, int n, double * a, double * c, double beta);
 	Matrix operator+(const Matrix &A);
 	/*
@@ -84,9 +89,9 @@ public:
 				y = A*x
 	*/	
 	void MatrixMulVector(int m, int n, double *a, double *x, double *y);
-	//friend Matrix operator*(const Vector &);
+	Vector operator*(Vector &);
 	/*
-		Description: A*k
+		Description: A*ks
 		Input:
 		Output:
 		Others:
@@ -115,7 +120,7 @@ public:
 		Output: Matrix D = A/B
 		Others: function operator/() is ok!
 	*/
-	void MatrixRightDiv();
+	void MatrixRightDiv(Matrix B);
 	Matrix operator/(Matrix &A);
 	/*
 		Description: judge A = B
@@ -123,7 +128,8 @@ public:
 		Output:
 		Others:
 	*/
-	bool MatrixIsEqual();
+	bool MatrixIsEqual(Matrix);
+	bool operator==(const Matrix &B);
 	/*
 		Description: C = A'
 		Input: Matrix A's row col and array
@@ -151,11 +157,25 @@ public:
 	/*
 		Eigenvalue calculation of matrix
 	*/
-	
+
+	int MatrixIsPosDef();
+
+	int MatrixIsSym();
+
+	double MatrixTrace();
+
+	int MatrixEig(double *er, double *ei, Matrix &v);
+
 	/*
 		Matrix decomposition
 	*/
-	
+
+	int MatrixQRfactorization(Matrix &q, Matrix &r);
+
+	int MatrixLUfactorization(Matrix &l, Matrix &u, int *ipiv);
+
+	int MatrixSVDfactorization(double *s, Matrix &u, Matrix &vt);
+
 	/*
 		Norm of the matrix
 	*/

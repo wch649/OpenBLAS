@@ -1,0 +1,8 @@
+74£º#define lapack_complex_float    float _Complex
+-
+74£º#define lapack_complex_float    float// _Complex
+
+
+90£º#define lapack_complex_double   double _Complex
+-
+90£º#define lapack_complex_double   double// _Complex
