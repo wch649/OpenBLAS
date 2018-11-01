@@ -16,26 +16,21 @@ Vector::Vector(int n1,double *a)
 	v = (double *)malloc(n * sizeof(double));
 	for (int i = 0; i < n; i++) v[i] = a[i];
 }
-void Vector::setn(int n1)
-{
-	n = n1;
-	v = (double *)malloc(n * sizeof(double));
-}
-
 Vector::~Vector()
 {
 	//delete []v;
 }
-void Vector::setv()
+
+
+void Vector::setn(int n1)
 {
-	int t = n;
-	double *w = v;
-	cout << "input " << n << " numbers of this vector" << endl;
-	while (t) {
-		cin >> *w;
-		w++;
-		t--;
-	}
+	n = n1;
+}
+
+void Vector::setv(double *a)
+{
+	v = (double *)malloc(n * sizeof(double));
+	for (int i = 0; i < n; i++) v[i] = a[i];
 }
 int Vector::getn()
 {
@@ -59,23 +54,30 @@ void Vector::printv()
 	}
 	cout << endl;
 }
-void Vector::modifyv()
+void Vector::modifyv(int nl, double *a)
 {
+	setn(nl);
+	if(v) delete[]v;
+	setv(a);
+}
+
+void Vector::free()
+{
+	n = 0;
 	delete[]v;
-	setn(3);
-	setv();
 }
 
 
-Vector Vector::operator = (Vector &a)
+void Vector::operator = (const Vector &a)
 {
-	cblas_dcopy(a.getn(), a.getv(), 1, this->getv(), 1);
-	return *this;
+	n = a.n;
+	v = (double *)malloc(n * sizeof(double));
+	for (int i = 0; i < n; i++) v[i] = a.v[i];
 }
 
-double operator *(Vector &a, Vector &b)
+double operator *(const Vector &a, const Vector &b)
 {
-	return cblas_ddot(a.getn(), a.getv(), 1, b.getv(), 1);
+	return cblas_ddot(a.n, a.v, 1, b.v, 1);
 }
 
 double Vector::vector_1_norm()
@@ -93,6 +95,9 @@ double Vector::vector_inf_norm()
 	return fabs(v[cblas_idamax(this->n, this->v, 1)]);
 }
 
+/*
+	Not Class member function
+*/
 
 double norm(Vector x, int type)
 {

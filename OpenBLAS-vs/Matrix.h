@@ -23,7 +23,7 @@ public:
 	*/
 	Matrix(int n);
 	Matrix();
-
+	~Matrix();
 
 	void setsize(int m, int n);
 	void setrow(int m);
@@ -33,12 +33,13 @@ public:
 	int getcol();
 	double *getarray();
 	void show();
-	~Matrix();
-	
+	void modifyM(int, int, double *);
+	void free();
 	/*
 		Basic operation of the matrix
 	*/
 
+	void operator=(const Matrix &A);
 	/*
 		Description: A+B 
 		Input:	m: rows of C、A
@@ -49,7 +50,6 @@ public:
 		Output: C = a*A + b*C;
 		Others:
 	*/
-	//Matrix operator=(const Matrix &A);
 	void MatrixAdd(int m, int n, double * a, double * c, double beta);
 	Matrix operator+(const Matrix &A);
 	/*
@@ -91,10 +91,13 @@ public:
 	void MatrixMulVector(int m, int n, double *a, double *x, double *y);
 	Vector operator*(Vector &);
 	/*
-		Description: A*ks
+		Description: A*k
 		Input:
-		Output:
-		Others:
+			m: row of A
+			n: column of A
+			a: Matrix A
+			alpha: scalar
+		Output:C = alpha*A
 	*/
 	void MatrixMulNumber(int m, int n, double * a, double * c, double alpha);
 	Matrix MatrixAlpha(double alpha);
@@ -124,9 +127,9 @@ public:
 	Matrix operator/(Matrix &A);
 	/*
 		Description: judge A = B
-		Input:
-		Output:
-		Others:
+		Input: Matrix B
+		Output: 1 if A==B
+				0 if A!=B
 	*/
 	bool MatrixIsEqual(Matrix);
 	bool operator==(const Matrix &B);
@@ -148,8 +151,10 @@ public:
 	/*
 		Description: rank(A)
 		Input:
-		Output:
-		Others:
+			m: row of A
+			n: column of A
+			a: Matrix A
+		Output: rank(A)
 	*/
 	int MatrixRank(int m,int n, double *a);
 	
@@ -158,12 +163,34 @@ public:
 		Eigenvalue calculation of matrix
 	*/
 
+	/*
+		Description: judge A is Positive definite matrix
+		Input: no
+		Output: 1 is Positive definite matrix
+				0 is not Positive definite matrix
+	*/
 	int MatrixIsPosDef();
 
+	/*
+		Description: judge A is Symmetric matrix
+		Input: no
+		Output: 1 is Symmetric matrix
+				0 is not Symmetric matrix
+	*/
 	int MatrixIsSym();
 
+	/*
+		Description: Trace of the matrix
+		Input: no
+		Output: tr(A)
+	*/
 	double MatrixTrace();
 
+	/*
+		Description: Eigenvalue of matrix
+		Input: 
+		Output: eig(A)
+	*/
 	int MatrixEig(double *er, double *ei, Matrix &v);
 
 	/*
@@ -206,6 +233,7 @@ Matrix inv( Matrix A);
 	Output: Matrix C = A\B
 */
 Matrix ld(Matrix A, Matrix B);
+Vector ld(Matrix A, Vector x);
 /*
 	Description: A'
 	Input: Matrix A

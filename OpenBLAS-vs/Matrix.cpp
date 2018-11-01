@@ -100,6 +100,7 @@ void Matrix::setcol(int n)
 void Matrix::setarray(double * a)
 {
 	long int work = column * row;
+	array = new double[work];
 	for (int i = 0; i < work; i++) array[i] = a[i];
 }
 
@@ -135,17 +136,36 @@ void Matrix::show()
 	cout << endl;
 }
 
+void Matrix::modifyM(int m, int n, double * a)
+{
+	setrow(m);
+	setcol(n);
+	if (array) delete[]array;
+	setarray(a);
+}
+
+void Matrix::free()
+{
+	row = 0;
+	column = 0;
+	delete[]array;
+}
+
 
 /*
 		Basic operation of the matrix
 */
 
 
-/*Matrix Matrix::operator=(const Matrix & A)
+void Matrix::operator=(const Matrix & A)
 {
-	if (this->array) delete[]array;
-	return Matrix(A.row,A.column,A.array);s
-}*/
+	if (array) delete[]array;
+	row = A.row;
+	column = A.column;
+	array = new double[row*column];
+	long int work = row * column;
+	for (int i = 0; i < work; i++) array[i] = A.array[i];
+}
 
 void Matrix::MatrixAdd(int m, int n, double * a, double * c, double beta)
 {	//C = A + C
@@ -193,7 +213,7 @@ void Matrix::MatrixMulVector(int m, int n, double * a, double * x, double * y)
 Vector Matrix::operator*(Vector &v)
 {
 	Vector x(this->row);
-	MatrixMulVector(this->row, this->column, this->getarray(), v.getv(), x.getv());
+	this->MatrixMulVector(this->row, this->column, this->getarray(), v.getv(), x.getv());
 	return x;
 }
 
@@ -635,6 +655,23 @@ Matrix ld(Matrix A, Matrix B)
 	D = C * B;
 	delete[]barr;
 	return D;
+}
+
+Vector ld(Matrix A, Vector x)
+{
+	int m = A.getrow();//A: m*m
+	int n = x.getn();//x:n*1
+	double *barr = new double[m*m];
+	double *temp = A.getarray();
+	int work = m * m;
+	for (int i = 0; i < work; i++) {
+		barr[i] = temp[i];
+	}
+	Matrix C(m, m, barr);
+	C.MatrixInverse(barr, m);//C = A, C -> inv(C)
+	Vector y = C * x;
+	delete[]barr;
+	return y;
 }
 
 Matrix tran(Matrix A)
